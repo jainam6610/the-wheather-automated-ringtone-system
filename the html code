@@ -1,0 +1,1083 @@
+function checkRainAlert(weather) {
+            if (!smsEnabled || !isAwayFromHome || !locationPermissionGranted) return;
+            
+            if ((weather === 'rainy' || weather === 'stormy') && Date.now() - lastSMSTime > 300000) { // 5 minutes cooldown
+                sendEmergencySMS();
+                lastSMSTime = Date.now();
+            }
+        }
+
+        function sendEmergencySMS() {
+            // Validate inputs
+            const senderCountryCode = document.getElementById('senderCountryCode').value || '+91';
+            const senderNumber = document.getElementById('senderNumber').value;
+            const senderName = document.getElementById('senderName').value || 'Unknown';
+            
+            const receiverCountryCode = document.getElementById('receiverCountryCode').value || '+91';
+            const receiverNumber = document.getElementById('receiverNumber').value;
+            const receiverName = document.getElementById('receiverName').value || 'Emergency Contact';
+            
+            const customMessage = document.getElementById('customMessage').value;
+
+            if (!senderNumber || !receiverNumber) {
+                document.getElementById('status').textContent = 'Please set both sender and receiver phone numbers';
+                return;
+            }
+
+            const senderFullNumber = senderCountryCode + senderNumber;
+            const receiverFullNumber = receiverCountryCode + receiverNumber;
+            
+            // Create detailed message with location
+            const defaultMessage = `🚨 RAIN EMERGENCY ALERT 🚨
+From: ${senderName} (${senderFullNumber})
+Status: Caught in ${currentWeather} weather, away from home
+Distance from home: ${document.getElementById('distanceFromHome').textContent}
+Location: ${currentLocation.lat ? `${currentLocation.lat.toFixed(4)}, ${currentLocation.lng.toFixed(4)}` : 'Unknown'}
+Time: ${new Date().toLocaleString()}
+${customMessage ? '\nMessage: ' + customMessage : ''}
+Please check on me or send help if needed!`;
+            
+            simulateSMS(senderFullNumber, receiverFullNumber, receiverName, defaultMessage);
+        }
+
+        function simulateSMS(fromNumber, toNumber, toName, message) {
+            // Create detailed SMS preview popup
+            const smsPreview = document.createElement('div');
+            smsPreview.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                color: white;
+                padding: 25px;
+                border-radius: 20px;
+                max-width: 350px;
+                width: 90%;
+                z-index: 1000;
+                text-align: left;
+                border: 2px solid #ff6b6b;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                backdrop-filter: blur(10px);
+            `;
+            
+            smsPreview.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h3 style="color: #ff6b6b; margin: 0; font-size: 18px;">📱 SMS SENT SUCCESSFULLY</h3>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin: 15px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong style="color: #4CAF50;">From:</strong>
+                        <span style="font-size: 14px;">${fromNumber}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong style="color: #2196F3;">To:</strong>
+                        <span style="font-size: 14px;">${toName} (${toNumber})</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: #FF9800;">Time:</strong>
+                        <span style="font-size: 14px; margin-left: 5px;">${new Date().toLocaleString()}</span>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin: 15px 0; max-height: 200px; overflow-y: auto;">
+                    <strong style="color: #FFC107; display: block; margin-bottom: 8px;">Message:</strong>
+                    <div style="font-size: 13px; line-height: 1.4; white-space: pre-line;">${message}</div>
+                </div>
+                
+                <div style="background: rgba(76, 175, 80, 0.2); padding: 10px; border-radius: 8px; margin: 15px 0; font-size: 12px;">
+                    <strong>📍 Location Data Included:</strong><br>
+                    Current: ${currentLocation.lat ? `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}` : 'Unknown'}<br>
+                    Accuracy: ±${currentLocation.accuracy ? Math.round(currentLocation.accuracy) : '?'}m
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: linear-gradient(135deg, #ff6b6b, #ee5a52); 
+                                   border: none; color: white; padding: 10px 20px<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Ringtone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .weather-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .weather-title {
+            color: white;
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .weather-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .weather-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .weather-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .weather-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .weather-btn.selected {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .volume-control {
+            margin: 20px 0;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 5px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Weather-specific backgrounds */
+        .sunny { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .rainy { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .cloudy { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .stormy { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
+        .snowy { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .windy { background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .sms-config {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .config-section {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-group {
+            margin: 10px 0;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            color: white;
+            font-size: 12px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 5px;
+        }
+
+        .country-code {
+            width: 70px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 25px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 19px;
+            width: 19px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(25px);
+        }
+
+        .location-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .location-coords {
+            font-family: monospace;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.away {
+            background: #ff6b6b;
+        }
+
+        .status-indicator.tracking {
+            background: #2196F3;
+        }
+
+        .status-indicator.error {
+            background: #FFC107;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .sms-alert {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+            color: white;
+        }
+
+        .permission-btn {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .permission-btn:hover {
+            background: rgba(33, 150, 243, 0.5);
+        }
+
+        .distance-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body id="body" class="sunny">
+    <div class="container">
+        <div class="weather-icon" id="weatherIcon">☀️</div>
+        <h1 class="weather-title" id="weatherTitle">Sunny Day</h1>
+        <p class="weather-desc" id="weatherDesc">Perfect weather for outdoor activities</p>
+        
+        <div class="sms-config">
+            <h3 style="color: white; font-size: 16px; margin-bottom: 15px;">🚨 Rain Alert SMS System</h3>
+            
+            <div class="toggle-switch">
+                <label style="color: white; font-size: 14px;">Enable SMS Alert</label>
+                <label class="switch">
+                    <input type="checkbox" id="smsToggle" onchange="toggleSMS()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div id="smsSettings" style="display: none;">
+                
+                <div class="config-section">
+                    <div class="section-title">📱 Your Phone Details</div>
+                    <div class="input-group">
+                        <label>Your Phone Number (Sender)</label>
+                        <div class="phone-input">
+                            <input type="text" class="country-code" id="senderCountryCode" placeholder="+91" value="+91" maxlength="4">
+                            <input type="tel" id="senderNumber" placeholder="9876543210" maxlength="12">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Your Name</label>
+                        <input type="text" id="senderName" placeholder="Enter your name">
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="section-title">👥 Emergency Contact</div>
+                    <div class="input-group">
+                        <label>Contact Phone Number (Receiver)</label>
+                        <div class="phone-input">
+                            <input type="text" class="country-code" id="receiverCountryCode" placeholder="+91" value="+91" maxlength="4">
+                            <input type="tel" id="receiverNumber" placeholder="9876543210" maxlength="12">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Contact Name</label>
+                        <input type="text" id="receiverName" placeholder="Emergency contact name">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Custom Message (optional)</label>
+                        <input type="text" id="customMessage" placeholder="I'm caught in the rain and need help!">
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="section-title">📍 Location Tracking</div>
+                    <button class="permission-btn" onclick="requestLocationPermission()">
+                        🎯 Enable Location Tracking
+                    </button>
+                    
+                    <div class="location-info" id="locationInfo">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span id="locationStatus">Location: Not Available</span>
+                            <div class="status-indicator error" id="locationIndicator"></div>
+                        </div>
+                        <div class="distance-info">
+                            <span>Distance from home:</span>
+                            <span id="distanceFromHome">--</span>
+                        </div>
+                        <div class="location-coords" id="locationCoords">
+                            Coordinates: Not available
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Set Home Location (Optional - will auto-detect)</label>
+                        <input type="text" id="homeAddress" placeholder="Enter address or use current location">
+                    </div>
+                </div>
+
+                <div id="smsAlert" class="sms-alert" style="display: none;">
+                    ⚠️ SMS Alert System Active - Will notify emergency contact when rain is detected and you're away from home
+                </div>
+            </div>
+        </div>
+
+        <div class="weather-selector">
+            <button class="weather-btn selected" onclick="changeWeather('sunny')">☀️ Sunny</button>
+            <button class="weather-btn" onclick="changeWeather('rainy')">🌧️ Rainy</button>
+            <button class="weather-btn" onclick="changeWeather('cloudy')">☁️ Cloudy</button>
+            <button class="weather-btn" onclick="changeWeather('stormy')">⛈️ Stormy</button>
+            <button class="weather-btn" onclick="changeWeather('snowy')">❄️ Snowy</button>
+            <button class="weather-btn" onclick="changeWeather('windy')">💨 Windy</button>
+        </div>
+
+        <div class="volume-control">
+            <label style="color: white; font-size: 14px;">Volume</label>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="playBtn" onclick="playRingtone()">🎵 Play Weather Ringtone</button>
+            <button class="btn" id="stopBtn" onclick="stopRingtone()">⏹️ Stop Ringtone</button>
+        </div>
+
+        <div class="status" id="status">Select weather and play ringtone</div>
+    </div>
+
+    <script>
+        let currentWeather = 'sunny';
+        let audioContext;
+        let oscillator;
+        let gainNode;
+        let isPlaying = false;
+        let smsEnabled = false;
+        let currentLocation = { lat: null, lng: null, accuracy: null };
+        let homeLocation = null;
+        let isAwayFromHome = false;
+        let lastSMSTime = 0;
+        let locationWatchId = null;
+        let locationPermissionGranted = false;
+
+        const weatherData = {
+            sunny: {
+                icon: '☀️',
+                title: 'Sunny Day',
+                desc: 'Perfect weather for outdoor activities',
+                class: 'sunny',
+                frequency: 523.25, // C5
+                pattern: 'cheerful'
+            },
+            rainy: {
+                icon: '🌧️',
+                title: 'Rainy Weather',
+                desc: 'Gentle rain drops falling',
+                class: 'rainy',
+                frequency: 293.66, // D4
+                pattern: 'rain'
+            },
+            cloudy: {
+                icon: '☁️',
+                title: 'Cloudy Sky',
+                desc: 'Overcast with soft clouds',
+                class: 'cloudy',
+                frequency: 349.23, // F4
+                pattern: 'mellow'
+            },
+            stormy: {
+                icon: '⛈️',
+                title: 'Thunderstorm',
+                desc: 'Powerful storm approaching',
+                class: 'stormy',
+                frequency: 146.83, // D3
+                pattern: 'dramatic'
+            },
+            snowy: {
+                icon: '❄️',
+                title: 'Snowy Day',
+                desc: 'Gentle snowflakes falling',
+                class: 'snowy',
+                frequency: 659.25, // E5
+                pattern: 'crystalline'
+            },
+            windy: {
+                icon: '💨',
+                title: 'Windy Weather',
+                desc: 'Strong winds blowing',
+                class: 'windy',
+                frequency: 440.00, // A4
+                pattern: 'flowing'
+            }
+        };
+
+        function changeWeather(weather) {
+            currentWeather = weather;
+            const data = weatherData[weather];
+            
+            // Update UI
+            document.getElementById('weatherIcon').textContent = data.icon;
+            document.getElementById('weatherTitle').textContent = data.title;
+            document.getElementById('weatherDesc').textContent = data.desc;
+            document.getElementById('body').className = data.class;
+            
+            // Update button selection
+            document.querySelectorAll('.weather-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            document.getElementById('status').textContent = `Weather changed to ${data.title}`;
+            
+            // Check for rain alert
+            checkRainAlert(weather);
+            
+            // Stop current ringtone if playing
+            if (isPlaying) {
+                stopRingtone();
+            }
+        }
+
+        function toggleSMS() {
+            smsEnabled = document.getElementById('smsToggle').checked;
+            const smsSettings = document.getElementById('smsSettings');
+            const smsAlert = document.getElementById('smsAlert');
+            
+            if (smsEnabled) {
+                smsSettings.style.display = 'block';
+                smsAlert.style.display = 'block';
+            } else {
+                smsSettings.style.display = 'none';
+                smsAlert.style.display = 'none';
+                stopLocationTracking();
+            }
+        }
+
+        function requestLocationPermission() {
+            if (!navigator.geolocation) {
+                updateLocationStatus('Geolocation not supported', 'error');
+                return;
+            }
+
+            updateLocationStatus('Requesting permission...', 'tracking');
+
+            // Request high accuracy location
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    locationPermissionGranted = true;
+                    currentLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+                    
+                    // Set as home location if not already set
+                    if (!homeLocation) {
+                        homeLocation = { ...currentLocation };
+                        updateLocationStatus('Home location set', 'home');
+                    }
+                    
+                    startContinuousLocationTracking();
+                    updateLocationDisplay();
+                },
+                (error) => {
+                    locationPermissionGranted = false;
+                    handleLocationError(error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                }
+            );
+        }
+
+        function startContinuousLocationTracking() {
+            if (locationWatchId) {
+                navigator.geolocation.clearWatch(locationWatchId);
+            }
+
+            locationWatchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    currentLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+                    updateLocationDisplay();
+                    calculateDistanceFromHome();
+                },
+                (error) => {
+                    handleLocationError(error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 30000
+                }
+            );
+        }
+
+        function stopLocationTracking() {
+            if (locationWatchId) {
+                navigator.geolocation.clearWatch(locationWatchId);
+                locationWatchId = null;
+            }
+            updateLocationStatus('Location tracking stopped', 'error');
+        }
+
+        function handleLocationError(error) {
+            let message = '';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = 'Location access denied by user';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = 'Location information unavailable';
+                    break;
+                case error.TIMEOUT:
+                    message = 'Location request timed out';
+                    break;
+                default:
+                    message = 'Unknown location error';
+            }
+            updateLocationStatus(message, 'error');
+        }
+
+        function updateLocationStatus(status, type) {
+            const locationStatus = document.getElementById('locationStatus');
+            const locationIndicator = document.getElementById('locationIndicator');
+            
+            locationStatus.textContent = `Location: ${status}`;
+            
+            // Reset classes
+            locationIndicator.className = 'status-indicator';
+            
+            switch(type) {
+                case 'home':
+                    locationIndicator.classList.add('home');
+                    break;
+                case 'away':
+                    locationIndicator.classList.add('away');
+                    break;
+                case 'tracking':
+                    locationIndicator.classList.add('tracking');
+                    break;
+                case 'error':
+                    locationIndicator.classList.add('error');
+                    break;
+            }
+        }
+
+        function updateLocationDisplay() {
+            if (currentLocation.lat && currentLocation.lng) {
+                const coords = document.getElementById('locationCoords');
+                coords.textContent = `Lat: ${currentLocation.lat.toFixed(6)}, Lng: ${currentLocation.lng.toFixed(6)} (±${Math.round(currentLocation.accuracy)}m)`;
+                
+                if (homeLocation) {
+                    calculateDistanceFromHome();
+                }
+            }
+        }
+
+        function calculateDistanceFromHome() {
+            if (!homeLocation || !currentLocation.lat || !currentLocation.lng) {
+                document.getElementById('distanceFromHome').textContent = 'Unknown';
+                return;
+            }
+
+            const distance = getDistanceFromLatLonInKm(
+                homeLocation.lat, homeLocation.lng,
+                currentLocation.lat, currentLocation.lng
+            );
+
+            document.getElementById('distanceFromHome').textContent = `${distance.toFixed(2)} km`;
+            
+            // Consider away from home if more than 0.5km (500m)
+            const wasAwayFromHome = isAwayFromHome;
+            isAwayFromHome = distance > 0.5;
+            
+            if (isAwayFromHome !== wasAwayFromHome) {
+                if (isAwayFromHome) {
+                    updateLocationStatus('Away from home', 'away');
+                } else {
+                    updateLocationStatus('At home', 'home');
+                }
+            }
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+
+        function checkRainAlert(weather) {
+            if (!smsEnabled || !isAwayFromHome) return;
+            
+            if ((weather === 'rainy' || weather === 'stormy') && Date.now() - lastSMSTime > 300000) { // 5 minutes cooldown
+                sendEmergencySMS();
+                lastSMSTime = Date.now();
+            }
+        }
+
+        function sendEmergencySMS() {
+            const emergencyNumber = document.getElementById('emergencyNumber').value;
+            const customMessage = document.getElementById('customMessage').value;
+            
+            if (!emergencyNumber) {
+                document.getElementById('status').textContent = 'Please set emergency contact number';
+                return;
+            }
+            
+            const defaultMessage = "🌧️ RAIN ALERT: I'm caught in the rain and away from home. Please check on me!";
+            const message = customMessage || defaultMessage;
+            
+            // In a real implementation, this would use SMS API like Twilio
+            // For demo purposes, we'll simulate the SMS
+            simulateSMS(emergencyNumber, message);
+        }
+
+        function simulateSMS(number, message) {
+            // Create SMS preview popup
+            const smsPreview = document.createElement('div');
+            smsPreview.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 20px;
+                border-radius: 15px;
+                max-width: 300px;
+                z-index: 1000;
+                text-align: center;
+                border: 2px solid #ff6b6b;
+            `;
+            
+            smsPreview.innerHTML = `
+                <h3 style="color: #ff6b6b; margin-bottom: 10px;">📱 SMS SENT</h3>
+                <p><strong>To:</strong> ${number}</p>
+                <p><strong>Message:</strong></p>
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; margin: 10px 0; border-radius: 8px; font-size: 14px;">
+                    ${message}
+                </div>
+                <small style="color: #ccc;">Location: ${isAwayFromHome ? 'Away from Home' : 'At Home'}</small>
+                <br><br>
+                <button onclick="this.parentElement.remove()" style="background: #ff6b6b; border: none; color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Close</button>
+            `;
+            
+            document.body.appendChild(smsPreview);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (smsPreview.parentElement) {
+                    smsPreview.remove();
+                }
+            }, 5000);
+            
+            document.getElementById('status').textContent = `🚨 Emergency SMS sent to ${number}`;
+            
+            // In real implementation, replace this with actual SMS API call:
+            /*
+            fetch('/send-sms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    to: number,
+                    message: message,
+                    location: currentLocation
+                })
+            });
+            */
+        }
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                gainNode = audioContext.createGain();
+                gainNode.connect(audioContext.destination);
+            }
+        }
+
+        function playRingtone() {
+            if (isPlaying) return;
+            
+            initAudio();
+            
+            const data = weatherData[currentWeather];
+            const volume = document.getElementById('volumeSlider').value / 100;
+            
+            gainNode.gain.setValueAtTime(volume * 0.3, audioContext.currentTime);
+            
+            isPlaying = true;
+            document.getElementById('playBtn').classList.add('active');
+            document.getElementById('status').textContent = `Playing ${data.title} ringtone...`;
+            
+            playWeatherPattern(data);
+        }
+
+        function playWeatherPattern(data) {
+            const baseFreq = data.frequency;
+            let noteIndex = 0;
+            
+            function playNote() {
+                if (!isPlaying) return;
+                
+                // Stop previous oscillator
+                if (oscillator) {
+                    oscillator.stop();
+                }
+                
+                oscillator = audioContext.createOscillator();
+                oscillator.connect(gainNode);
+                
+                let frequency = baseFreq;
+                let duration = 500;
+                
+                // Different patterns for different weather
+                switch (data.pattern) {
+                    case 'cheerful':
+                        const cheerfulNotes = [1, 1.25, 1.5, 1.25];
+                        frequency = baseFreq * cheerfulNotes[noteIndex % cheerfulNotes.length];
+                        oscillator.type = 'sine';
+                        duration = 400;
+                        break;
+                        
+                    case 'rain':
+                        frequency = baseFreq + (Math.random() - 0.5) * 50;
+                        oscillator.type = 'triangle';
+                        duration = 200 + Math.random() * 300;
+                        break;
+                        
+                    case 'mellow':
+                        const mellowNotes = [1, 0.89, 0.75, 0.89];
+                        frequency = baseFreq * mellowNotes[noteIndex % mellowNotes.length];
+                        oscillator.type = 'sine';
+                        duration = 600;
+                        break;
+                        
+                    case 'dramatic':
+                        const dramaticNotes = [1, 0.5, 1.5, 0.75];
+                        frequency = baseFreq * dramaticNotes[noteIndex % dramaticNotes.length];
+                        oscillator.type = 'sawtooth';
+                        duration = 800;
+                        break;
+                        
+                    case 'crystalline':
+                        const crystallineNotes = [1, 1.5, 2, 1.5, 1.25];
+                        frequency = baseFreq * crystallineNotes[noteIndex % crystallineNotes.length];
+                        oscillator.type = 'triangle';
+                        duration = 350;
+                        break;
+                        
+                    case 'flowing':
+                        frequency = baseFreq + Math.sin(noteIndex * 0.5) * 100;
+                        oscillator.type = 'sine';
+                        duration = 300;
+                        break;
+                }
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + duration / 1000);
+                
+                noteIndex++;
+                
+                setTimeout(playNote, duration + 100);
+            }
+            
+            playNote();
+        }
+
+        function stopRingtone() {
+            isPlaying = false;
+            
+            if (oscillator) {
+                oscillator.stop();
+                oscillator = null;
+            }
+            
+            document.getElementById('playBtn').classList.remove('active');
+            document.getElementById('status').textContent = 'Ringtone stopped';
+        }
+
+        // Volume control
+        document.getElementById('volumeSlider').addEventListener('input', function() {
+            if (gainNode) {
+                gainNode.gain.setValueAtTime(this.value / 100 * 0.3, audioContext.currentTime);
+            }
+        });
+
+        // Simulate weather detection (in real implementation, this would use sensors or APIs)
+        function simulateWeatherDetection() {
+            const weathers = ['sunny', 'rainy', 'cloudy', 'stormy', 'snowy', 'windy'];
+            const randomWeather = weathers[Math.floor(Math.random() * weathers.length)];
+            
+            // Auto-change weather every 30 seconds for demo
+            setTimeout(() => {
+                changeWeatherProgrammatically(randomWeather);
+                document.getElementById('status').textContent = `Auto-detected: ${weatherData[randomWeather].title}`;
+                simulateWeatherDetection();
+            }, 30000);
+        }
+
+        function changeWeatherProgrammatically(weather) {
+            currentWeather = weather;
+            const data = weatherData[weather];
+            
+            // Update UI
+            document.getElementById('weatherIcon').textContent = data.icon;
+            document.getElementById('weatherTitle').textContent = data.title;
+            document.getElementById('weatherDesc').textContent = data.desc;
+            document.getElementById('body').className = data.class;
+            
+            // Update button selection
+            document.querySelectorAll('.weather-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.textContent.includes(data.icon)) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            // Check for rain alert
+            checkRainAlert(weather);
+            
+            // Stop current ringtone if playing
+            if (isPlaying) {
+                stopRingtone();
+            }
+        }
+
+        // Start weather simulation
+        simulateWeatherDetection();
+
+        // Initialize
+        document.getElementById('status').textContent = 'Weather Ringtone System Ready';
+    </script>
+</body>
+</html>
